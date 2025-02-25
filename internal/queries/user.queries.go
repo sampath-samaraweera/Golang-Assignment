@@ -22,8 +22,10 @@ func UserExists(user_id int) (bool, error) {
 	return count > 0, nil
 }
 
+//create user
 func AddUser(user_id int, user_name, password string) error{
 	log.Println("User:", user_id)
+	// SQL query to insert a new user
 	query := "INSERT INTO users (user_id, username, password) VALUES (?, ?, ?)"
 
 	_, err := config.DB.Exec(query, user_id, user_name, password)
@@ -33,7 +35,10 @@ func AddUser(user_id int, user_name, password string) error{
 	return nil
 }
 
+// Log in a user by validating their username and password
 func UserLogin(username string) (int, string, error) {
+	
+	// SQL query to get user_id and password for a given username
 	query := "SELECT user_id, password FROM users WHERE username = ?"
 
 	var user_id int
@@ -51,7 +56,20 @@ func UserLogin(username string) (int, string, error) {
 	return user_id, password, nil
 }
 
+//update username
 func UpdateUsername(userID int, newUsername models.UpdateUser) error {
+	
+	// Check if user exists
+	exists, err := UserExists(userID)
+
+	if err != nil {
+		return err
+	}
+	if !exists {
+		return fmt.Errorf("user not found")
+	}
+
+	// sql query to update the username for a given user ID
 	query := "UPDATE users SET username = ? WHERE user_id = ?"
 
 	result, err := config.DB.Exec(query, newUsername.NewUserName, userID)
@@ -72,13 +90,27 @@ func UpdateUsername(userID int, newUsername models.UpdateUser) error {
 	return nil
 }
 
+//delete user
 func DeleteUser(userID int) error {
+
+	// Check if user exists
+	exists, err := UserExists(userID)
+
+	if err != nil {
+		return err
+	}
+	if !exists {
+		return fmt.Errorf("user not found")
+	}
+
+	// SQL query to delete a user
 	query := "DELETE FROM users WHERE user_id = ?";
 	result, err := config.DB.Exec(query, userID)
 	if err != nil {
 		return err
 	}
 
+	// Check if any rows were affected
 	rowsAffected, err := result.RowsAffected()
 	if err != nil {
 		return err
@@ -89,7 +121,10 @@ func DeleteUser(userID int) error {
 	return nil
 }
 
+// get all users
 func GetAllUsers() (*sql.Rows, error)  {
+
+	// SQL query to get all users
 	query:= "SELECT * FROM users"
 
 	rows, err := config.DB.Query(query)

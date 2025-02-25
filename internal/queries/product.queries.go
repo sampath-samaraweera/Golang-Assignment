@@ -23,8 +23,11 @@ func ProductExists(p_id int) (bool, error) {
 	return count > 0, nil
 }
 
+// Add   new product 
 func AddProduct(name string, p_type string, price int, quantity int) error{
 	log.Println("Product:", name)
+
+	// SQL query to insert a new product
 	query := "INSERT INTO products (name, p_type, price, quantity) VALUES (?, ?, ?, ?)"
 
 	_, err := config.DB.Exec(query, name, p_type, price, quantity)
@@ -34,6 +37,7 @@ func AddProduct(name string, p_type string, price int, quantity int) error{
 	return nil
 }
 
+//update product
 func UpdateProduct(p_id int, updatedProduct models.UpdateProduct) error {
 	log.Println("Executing Update for Product ID:", p_id)
 	
@@ -75,11 +79,11 @@ func UpdateProduct(p_id int, updatedProduct models.UpdateProduct) error {
 		return fmt.Errorf("no fields to update")
 	}
 
-	// Construct SQL query
+	// sql query to update product
 	query := fmt.Sprintf("UPDATE products SET %s WHERE p_id = ?", strings.Join(updateFields, ", "))
 	args = append(args, p_id)
 
-	// Execute query
+	// execute query
 	_, err = config.DB.Exec(query, args...)
 	if err != nil {
 		log.Println("Error executing update query:", err)
@@ -90,7 +94,9 @@ func UpdateProduct(p_id int, updatedProduct models.UpdateProduct) error {
 	return nil
 }
 
+//delete product
 func DeleteProduct(p_id int) error {
+
 	// Check if product exists
 	exists, err := ProductExists(p_id)
 
@@ -101,6 +107,7 @@ func DeleteProduct(p_id int) error {
 		return fmt.Errorf("product not found")
 	}
 	
+	// sql query Delete the product
 	query := "DELETE FROM products WHERE p_id = ?";
 	result, err := config.DB.Exec(query, p_id)
 	if err != nil {
@@ -117,7 +124,10 @@ func DeleteProduct(p_id int) error {
 	return nil
 }
 
+//get all products
 func GetAllProducts() (*sql.Rows, error)  {
+
+	// SQL query to get all products
 	query:= "SELECT * FROM products"
 
 	rows, err := config.DB.Query(query)

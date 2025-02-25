@@ -35,14 +35,20 @@ func AddOrder(user_id int, p_id int, ordered_quantity int) error {
 	if !exists {
 		return fmt.Errorf("product not found")
 	}
-	var price int
+	var price, quantity int
 
 	// get product price
-	query := "SELECT price FROM products WHERE p_id = ?"
-	err = config.DB.QueryRow(query, p_id).Scan(&price)
+	query := "SELECT price, quantity FROM products WHERE p_id = ?"
+	err = config.DB.QueryRow(query, p_id).Scan(&price, &quantity)
 	if err != nil {
 		return fmt.Errorf("error fetching product price: %v", err)
 	}
+
+	if quantity < ordered_quantity {
+		return fmt.Errorf("error: ordered quantity (%d) exceeds available stock (%d)", ordered_quantity, quantity)
+	}
+	
+
 
 	// Check if user exists
 	exists, err = UserExists(user_id)

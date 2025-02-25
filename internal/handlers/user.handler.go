@@ -26,7 +26,7 @@ func RegisterUser(w http.ResponseWriter, r *http.Request){
 		log.Println("error",err)
 		return
 	}	
-	
+	log.Println(user.UserName)
 	// Validate required fields
 	if user.UserName == "" || user.Password == "" {
 		http.Error(w, "Missing required fields", http.StatusBadRequest)
@@ -59,14 +59,14 @@ func RegisterUser(w http.ResponseWriter, r *http.Request){
 
 func LoginUser(w http.ResponseWriter, r *http.Request)  {
 	var user models.UserLogin
-		
+	
 	// Decode JSON request
 	err := json.NewDecoder(r.Body).Decode(&user)
 	if err != nil {
 		http.Error(w, "Invalid JSON request", http.StatusBadRequest)
 		log.Println("error",err)
 		return
-	}	
+	}
 
 	// Validate required fields
 	if user.UserName == "" || user.Password == "" {
